@@ -525,11 +525,16 @@ class FMUWorkspace:
         # res is formatted as: {"model_name" : "file_name.csv", "model_name2" : "file_name2.csv"}
         res = self.get_result(name_or_index)
         if res is None:
-            return 0
-        elif res is Exception:
+            print(f"'{name_or_index}' does not exist in results.")
+            return None
+        elif isinstance(res, Exception):
             error_str = str(res)
             print(error_str)
-            return -1
+            return None
+        elif isinstance(res, exceptions.FMUException):
+            error_str = str(res)
+            print(error_str)
+            return None
         
         if x_axis_fmu in res:
             try:
