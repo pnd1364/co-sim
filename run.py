@@ -26,7 +26,8 @@ def login_or_reg():
             print(f"Login failed with {status} - {text}. Please try again.")
             return 0
         print(text)
-        return 1
+    return 1
+    
 
 if __name__ == "__main__":
 
