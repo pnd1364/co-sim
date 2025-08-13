@@ -292,6 +292,8 @@ def main(result_dir, fmu_objects, connections, start_time = 0, final_time = 60, 
 
     for fmu_obj in fmu_objects:
         models.append(fmu_obj.loaded_fmu)
+        if "idf" in fmu_obj.loaded_fmu.get_generation_tool() or "energyplus" in fmu_obj.loaded_fmu.get_generation_tool():
+            hasEnergyPlus = True
 
     try:
         master = Master(models, connections)
