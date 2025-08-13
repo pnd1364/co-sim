@@ -1,0 +1,38 @@
+pip install fmu-manipulation-toolbox
+
+
+List of pip installs:
+- conda install python=3.11
+- pip install numpy
+- pip install matplotlib
+- pip install matlabengine=... whatever version 
+- pip install pythonFMU					this exports a PYTHON project as an fmu... which i dont think is 							necessary
+- pip install OMpython
+
+- pip install EnergyPlusToFMU ?
+
+matplotlib
+^ pylab
+
+assimulo
+
+
+
+
+1. python
+2. pyfmi using conda-forge
+3. assimulo with conda-forge
+pandas
+
+4. fmpy 
+5. shutil (m)
+pip install lxml OR
+eppy
+matplotlib
+
+
+
+django
+huey
+redis
+gevent
