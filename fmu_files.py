@@ -303,6 +303,11 @@ class FMUWorkspace:
     """
     Overall helper methods
     """
+    # TODO: change connection to just be the name, the real connection will be made later inside of run_sim
+    def get_inverted_dict(self):
+        # invert dictionary {fmu_object: fmu_name}
+        return {v.loaded_fmu: k for k, v in self.fmu_objects.items()}
+
     def get_loaded_fmu(self, fmu_name = None):
         if fmu_name is not None:
             return self.fmu_objects[fmu_name].loaded_fmu
@@ -695,7 +700,9 @@ class FMUWorkspace:
         Function to delete an FMU from the fmuFiles dictionary and clears links to it.
         """
         if fmu_name in self.fmu_objects:
-            self.unlink_input_output(fmu_name)
+            ret = self.unlink_input_output(fmu_name)
+            if not ret:
+                return 0
             print(f"Connections related to FMU {fmu_name} have been removed.")
 
             del self.fmu_objects[fmu_name]
@@ -875,6 +882,8 @@ class FMUWorkspace:
                 else:
                     print("Stopping unlinking proceedure...")
                     return 0
+                
+            inverted_dict = self.get_inverted_dict()
             
             for tuple in self.connections:
                 if (tuple[0] == fmu1):
@@ -883,7 +892,8 @@ class FMUWorkspace:
                 if (tuple[2] == fmu1):
                     if (tuple[3] == input_name or input_name == "All"):
                         self.connections.remove(tuple)
-                self.fmu_objects[tuple[2]].remove_connection(tuple[3])
+                fmu_name = inverted_dict.get(tuple[2])
+                self.fmu_objects[fmu_name].remove_connection(tuple[3])
         elif fmu_name_2 not in self.fmu_objects:
             print(f"Error: FMU '{fmu_name_2}' do not exist.")
             return 0
@@ -900,7 +910,7 @@ class FMUWorkspace:
             print("New connections: ")
             self.list_links()
 
-            return 1
+        return 1
 
 
     def check_inputs_warning(self):
@@ -1014,7 +1024,8 @@ class FMUWorkspace:
         Function that prints all connection/links
         """
         # invert dictionary {fmu_object: fmu_name}
-        inverted_dict = {v.loaded_fmu: k for k, v in self.fmu_objects.items()}
+        inverted_dict = self.get_inverted_dict()
+
         print("Output:                                         Input:")
         for tuple in self.connections:
             input_file_name = inverted_dict.get(tuple[0])
@@ -1074,6 +1085,10 @@ class FMUWorkspace:
                 except FileNotFoundError as e:
                     print(e)
 
+
+    def update_workspace(self, workspace_name):
+        return -1
+
     
     def format_export_workspace(self, workspace_name):
         workspace_json = {
@@ -1098,14 +1113,17 @@ class FMUWorkspace:
 
     def format_export_connection(self):
         connection_jsons = []
+        # invert dictionary {fmu_object: fmu_name}
+        inverted_dict = self.get_inverted_dict()
+
         for tuple in self.connections:
             output_fmu = tuple[0]
             output_name = tuple[1]
             input_fmu = tuple[2]
             input_name = tuple[3]
 
-            output_fmu_name = [k for k, v in self.fmu_objects.items() if v.loaded_fmu == output_fmu][0]
-            input_fmu_name = [k for k, v in self.fmu_objects.items() if v.loaded_fmu == input_fmu][0]
+            output_fmu_name = inverted_dict.get(output_fmu, None)
+            input_fmu_name = inverted_dict.get(input_fmu, None)
 
             connection_jsons.append({"output_model" : output_fmu_name, "output_var_name" : output_name, "input_model":input_fmu_name, "input_var_name":input_name})
         return connection_jsons
