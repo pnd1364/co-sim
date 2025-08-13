@@ -1,0 +1,8 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# ignore all folders named "Result_and_Logs"
+**/Result_and_Logs
+**/Result_and_Logs_[0-20]
