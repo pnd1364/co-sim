@@ -3,6 +3,31 @@ import sys
 import fmu_files
 import API_code
 
+def login_or_reg():
+    if not session.logged_in:
+        print("No session currently active.")
+        login_or_register = input("Would you like to login or register? [login/register] ")
+        while login_or_register.lower() not in ['login', 'register']:
+            print("canceling...")
+            return 0
+
+        username = input("Enter your username: ")
+        password = input("Enter your password: ")
+
+        if login_or_register.lower() == 'register':
+            status, text = session.register(username, password)
+            if status != 200:
+                print(f"Registration failed with {status} - {text}. Please try again.")
+                return 0
+
+        # login after registering    
+        status, text  = session.login(username, password)
+        if status != 200:
+            print(f"Login failed with {status} - {text}. Please try again.")
+            return 0
+        print(text)
+        return 1
+
 if __name__ == "__main__":
 
     print("")
@@ -202,6 +227,7 @@ if __name__ == "__main__":
                 continue
             # export + exit commands
             print("export <workspace_name> :                                                        Export current workspace to API with user chosen <workspace_name>")
+            print("get-API-link")
             print("")
             print("To exit, type 'exit' or 'quit'.")
         elif (ret == "exit" or ret == "quit"):
@@ -559,38 +585,25 @@ if __name__ == "__main__":
                 print("Please input workspace name and try again.")
                 continue
 
-            if not session.logged_in:
-                print("No session currently active.")
-                login_or_register = input("Would you like to login or register? [login/register] ")
-                while login_or_register.lower() not in ['login', 'register']:
-                    print("canceling...")
-                    continue
-                
-                username = input("Enter your username: ")
-                password = input("Enter your password: ")
-
-                if login_or_register.lower() == 'register':
-                    status, text = session.register(username, password)
-                    if status != 200:
-                        print(f"Registration failed with {status} - {text}. Please try again.")
-                        continue
-
-                # login after registering    
-                status, text  = session.login(username, password)
-                if status != 200:
-                    print(f"Login failed with {status} - {text}. Please try again.")
-                    continue  
-                print(text)
+            if not login_or_reg():
+                continue
 
             workspace_json, fmu_jsons, fmu_paths, connection_jsons = fmu.format_export_workspace(workspace_name)
 
             # TODO: figure out what we want to return. currently it just returns everything in a long string. format it better
-            ret = session.export_workspace(workspace_json, fmu_jsons, fmu_paths, connection_jsons)
+            post_ret, get_ret = session.export_workspace(workspace_json, fmu_jsons, fmu_paths, connection_jsons)
             # if ret is not None:
             #     print(f"Workspace exported successfully, workspace id: {ret}")
             # else:
             #     print("Failed to export workspace.")
-            print(ret)
+            print(post_ret)
+            print(get_ret)
+        elif (ret == "get-API-link"):
+            if echo:
+                print("get-API-link")
+
+            print(session.base_url + "docs")
+
         else:
             print(f"Unknown command: {ret}. Type 'help' for a list of commands.")
             continue

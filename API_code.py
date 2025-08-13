@@ -24,26 +24,20 @@ class APISession():
 
 
     # TODO: figure out if one part fails, what do we do? like break and delete everything?
-    def export_workspace(self, workspace_json, fmu_jsons, fmu_paths, connection_jsons):
-        workspace_url = self.base_url + "add_workspace"
-        fmu_url = self.base_url + "add_fmu"
-        connection_url = self.base_url + "add_connection"
+    def export_workspace(self, workspace_json, fmu_jsons, fmu_files, connection_jsons):
+        workspace_url = self.base_url + "add_full_workspace"
+        workspace_get = self.base_url + "get_workspaces"
 
-        response = self.session.post(url = workspace_url, data = json.dumps(workspace_json))
+        workspace_json["fmus"] = fmu_jsons
+        workspace_json["connections"] = connection_jsons
 
-        total_response_text = response.text
+        data = {"payload" : json.dumps(workspace_json)}
 
-        if response.status_code == 200:
-            for fmu_json, fmu_path in zip(fmu_jsons, fmu_paths):
-                # data does NOT have json.dumps because content type is not application/json, instead it is multipart so with Form style
-                fmu_response = self.session.post(url = fmu_url, data = fmu_json, files = {'file': (fmu_json["fmu_name"], open(fmu_path, 'rb'))})
-                total_response_text = total_response_text + fmu_response.text
+        post_response = self.session.post(url = workspace_url, data = data, files = tuple(fmu_files))
 
-            for connection_json in connection_jsons:
-                connection_response = self.session.post(url = connection_url, data = json.dumps(connection_json))
-                total_response_text = total_response_text + connection_response.text
+        get_response = self.session.get(url=workspace_get, params={"name": workspace_json["name"]})
 
-        return total_response_text
+        return post_response.text, get_response.text
         
         
     def login(self, username, password):

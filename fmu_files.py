@@ -1076,22 +1076,22 @@ class FMUWorkspace:
             "step_size" : get_master_step_size(self.fmu_objects.values())
         }
 
-        fmu_jsons, fmu_paths = self.format_export_fmus(workspace_name)
-        connection_jsons = self.format_export_connection(workspace_name)
+        fmu_jsons, fmu_files = self.format_export_fmus()
+        connection_jsons = self.format_export_connection()
 
-        return workspace_json, fmu_jsons, fmu_paths, connection_jsons
+        return workspace_json, fmu_jsons, fmu_files, connection_jsons
 
-    def format_export_fmus(self, workspace_name):
+    def format_export_fmus(self):
         fmu_jsons = []
-        fmu_paths = []
+        fmu_files = []
         for fmu_name, fmu_object in self.fmu_objects.items():
-            fmu_jsons.append({"workspace":workspace_name, "fmu_name":fmu_name})
+            fmu_jsons.append({"fmu_name":fmu_name})
             # not formatting this as it needs to be open(...) when sending over response
-            fmu_paths.append(fmu_object.fmu_path)
-        return fmu_jsons, fmu_paths
+            fmu_files.append(("files", (fmu_name, open(fmu_object.fmu_path, "rb"))))
+        return fmu_jsons, fmu_files
 
 
-    def format_export_connection(self, workspace_name):
+    def format_export_connection(self):
         connection_jsons = []
         for tuple in self.connections:
             output_fmu = tuple[0]
@@ -1102,7 +1102,7 @@ class FMUWorkspace:
             output_fmu_name = [k for k, v in self.fmu_objects.items() if v.loaded_fmu == output_fmu][0]
             input_fmu_name = [k for k, v in self.fmu_objects.items() if v.loaded_fmu == input_fmu][0]
 
-            connection_jsons.append({"workspace":workspace_name, "output_model" : output_fmu_name, "output_var_name" : output_name, "input_model":input_fmu_name, "input_var_name":input_name})
+            connection_jsons.append({"output_model" : output_fmu_name, "output_var_name" : output_name, "input_model":input_fmu_name, "input_var_name":input_name})
         return connection_jsons
     
             
