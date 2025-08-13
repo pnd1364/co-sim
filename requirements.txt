@@ -1,38 +1,15 @@
-pip install fmu-manipulation-toolbox
+# please add conda-forge to your channels
+# conda config --add channels confa-forge
 
+# install these through conda:
+# conda install python=3.13.5
+# conda install numpy
+# conda install pyfmi=2.17.2
+# conda install assimulo
 
-List of pip installs:
-- conda install python=3.11
-- pip install numpy
-- pip install matplotlib
-- pip install matlabengine=... whatever version 
-- pip install pythonFMU					this exports a PYTHON project as an fmu... which i dont think is 							necessary
-- pip install OMpython
-
-- pip install EnergyPlusToFMU ?
-
-matplotlib
-^ pylab
-
-assimulo
-
-
-
-
-1. python
-2. pyfmi using conda-forge
-3. assimulo with conda-forge
+# it's one or the other, currently I'm not sure which one we want to use for finding step_size
+eppy==0.5.63
+FMPy==0.3.25
+matplotlib==3.10.3
 pandas
-
-4. fmpy 
-5. shutil (m)
-pip install lxml OR
-eppy
-matplotlib
-
-
-
-django
-huey
-redis
-gevent
+requests
