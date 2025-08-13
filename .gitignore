@@ -4,5 +4,5 @@ __pycache__/
 *$py.class
 
 # ignore all folders named "Result_and_Logs"
-**/Result_and_Logs
-**/Result_and_Logs_[0-20]
+Result_and_Logs/
+Result_and_Logs_[0-20]/
